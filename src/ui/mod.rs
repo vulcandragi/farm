@@ -28,8 +28,6 @@ impl Plugin for UiPlugin {
 fn setup(mut commands: Commands) {
     commands.queue_spawn_scene(bsn! {
         Node {
-            width: percent(100),
-            height: percent(100),
             padding: px(20),
         }
         Children [

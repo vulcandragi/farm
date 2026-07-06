@@ -1,8 +1,11 @@
 use bevy::{
     ecs::observer::On,
-    log::info,
+    log::{info, warn},
     math::Vec3,
-    picking::events::{Click, Pointer},
+    picking::{
+        Pickable,
+        events::{Pointer, Press},
+    },
     scene::{Scene, SceneComponent, bsn, on},
     sprite::Sprite,
 };
@@ -40,9 +43,10 @@ impl Block {
         bsn! {
             #Block
             Sprite {
-                image: sprite
+                image: sprite,
             }
-            on(|click: On<Pointer<Click>>| info!("test"))
+            Pickable::default()
+            on(|click: On<Pointer<Press>>| warn!("test"))
         }
     }
 }
