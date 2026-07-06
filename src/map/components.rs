@@ -1,6 +1,9 @@
 use bevy::{
+    ecs::observer::On,
+    log::info,
     math::Vec3,
-    scene::{Scene, SceneComponent, bsn},
+    picking::events::{Click, Pointer},
+    scene::{Scene, SceneComponent, bsn, on},
     sprite::Sprite,
 };
 
@@ -39,6 +42,7 @@ impl Block {
             Sprite {
                 image: sprite
             }
+            on(|click: On<Pointer<Click>>| info!("test"))
         }
     }
 }
