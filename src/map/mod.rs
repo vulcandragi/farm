@@ -1,27 +1,34 @@
 pub mod components;
+mod systems;
 
 use bevy::{
-    app::{Plugin, Startup},
+    app::{Plugin, Startup, Update},
     ecs::system::Commands,
-    math::Vec3,
+    math::I8Vec3,
     scene::{CommandsSceneExt, bsn},
 };
 
-use crate::map::components::{Block, BlockType};
+use crate::map::{
+    components::{BlockPos, grass::Grass},
+    systems::fix_block_position,
+};
 
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut bevy::app::App) {
-        app.add_systems(Startup, setup);
+        app.add_systems(Startup, setup)
+            .add_systems(Update, fix_block_position);
     }
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn_scene(bsn! {
-        @Block {
-            @pos: Vec3::ZERO,
-            @block_type: BlockType::Grass
+    for x in -25..25 {
+        for y in -25..25 {
+            commands.spawn_scene(bsn! {
+                @Grass
+                BlockPos(I8Vec3 { x: x, y: y, z: 0 })
+            });
         }
-    });
+    }
 }

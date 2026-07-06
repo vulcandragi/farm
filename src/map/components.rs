@@ -1,52 +1,10 @@
-use bevy::{
-    ecs::observer::On,
-    log::{info, warn},
-    math::Vec3,
-    picking::{
-        Pickable,
-        events::{Pointer, Press},
-    },
-    scene::{Scene, SceneComponent, bsn, on},
-    sprite::Sprite,
-};
+pub mod grass;
 
-#[derive(Default, Clone)]
-pub enum BlockType {
-    #[default]
-    None,
-    Grass,
-}
+use bevy::{ecs::component::Component, math::IVec3};
 
-impl BlockType {
-    pub fn to_sprite(&self) -> String {
-        match self {
-            BlockType::Grass => "blocks/grass.png".into(),
-            _ => "".into(),
-        }
-    }
-}
-
-#[derive(SceneComponent, Default, Clone)]
-#[scene(BlockProps)]
+#[derive(Component, Default, Clone)]
+#[require(BlockPos)]
 pub struct Block;
 
-#[derive(Default)]
-pub struct BlockProps {
-    pub pos: Vec3,
-    pub block_type: BlockType,
-}
-
-impl Block {
-    pub fn scene(props: BlockProps) -> impl Scene {
-        let sprite = props.block_type.to_sprite();
-
-        bsn! {
-            #Block
-            Sprite {
-                image: sprite,
-            }
-            Pickable::default()
-            on(|click: On<Pointer<Press>>| warn!("test"))
-        }
-    }
-}
+#[derive(Component, Default, Clone)]
+pub struct BlockPos(pub IVec3);

@@ -15,7 +15,7 @@ fn main() {
             EmbeddedAssetPlugin {
                 mode: PluginMode::ReplaceDefault,
             },
-            DefaultPlugins,
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
         ))
         .add_plugins(DevPlugin)
         .add_plugins((UiPlugin, CameraPlugin, ShopPlugin, MapPlugin))
