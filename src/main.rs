@@ -1,23 +1,31 @@
+mod assets;
 mod camera;
 mod dev;
+mod effects;
 mod map;
 mod shop;
+mod states;
 mod ui;
 
 use bevy::prelude::*;
-use bevy_embedded_assets::{EmbeddedAssetPlugin, PluginMode};
 
-use crate::{camera::CameraPlugin, dev::DevPlugin, map::MapPlugin, shop::ShopPlugin, ui::UiPlugin};
+use crate::{
+    assets::AssetsPlugin, camera::CameraPlugin, dev::DevPlugin, effects::EffectsPlugin,
+    map::MapPlugin, shop::ShopPlugin, states::AppState, ui::UiPlugin,
+};
 
 fn main() {
     App::new()
-        .add_plugins((
-            EmbeddedAssetPlugin {
-                mode: PluginMode::ReplaceDefault,
-            },
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
-        ))
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .init_state::<AppState>()
         .add_plugins(DevPlugin)
-        .add_plugins((UiPlugin, CameraPlugin, ShopPlugin, MapPlugin))
+        .add_plugins((
+            UiPlugin,
+            CameraPlugin,
+            ShopPlugin,
+            MapPlugin,
+            EffectsPlugin,
+            AssetsPlugin,
+        ))
         .run();
 }
