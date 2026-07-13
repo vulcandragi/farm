@@ -39,7 +39,7 @@ pub fn on_add_outile(
         texture: texture.clone(),
         settings: OutlineSettings {
             color: config.color.to_linear(),
-            thickness: config.thickness.into(),
+            thickness: config.thickness,
         },
     });
 

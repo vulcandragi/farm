@@ -46,7 +46,7 @@ impl Grass {
     fn on_hover_enter(event: On<Pointer<Over>>, mut commands: Commands) {
         commands.entity(event.entity).insert(SpriteOutline {
             color: Color::WHITE,
-            thickness: 1,
+            thickness: 0.1,
         });
     }
 

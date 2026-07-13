@@ -11,8 +11,8 @@ struct OutlineSettings {
 @group(2) @binding(2) var<uniform> settings: OutlineSettings;
 
 @fragment
-fn fragment(mesh: VertextOutput) -> @location vec4<f32> {
-let uv = mesh.uv;
+fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
+    let uv = mesh.uv;
     let tex_color = textureSample(sprite_texture, sprite_sampler, uv);
 
     if tex_color.a > 0.1 {
