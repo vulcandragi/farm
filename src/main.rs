@@ -8,6 +8,7 @@ mod states;
 mod ui;
 
 use bevy::prelude::*;
+use bevy_embedded_assets::{EmbeddedAssetPlugin, PluginMode};
 
 use crate::{
     assets::AssetsPlugin, camera::CameraPlugin, dev::DevPlugin, effects::EffectsPlugin,
@@ -16,16 +17,22 @@ use crate::{
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(EmbeddedAssetPlugin {
+            mode: PluginMode::ReplaceDefault,
+        })
+        .add_plugins((
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            MeshPickingPlugin,
+        ))
         .init_state::<AppState>()
         .add_plugins(DevPlugin)
         .add_plugins((
+            AssetsPlugin,
+            MapPlugin,
             UiPlugin,
             CameraPlugin,
             ShopPlugin,
-            MapPlugin,
             EffectsPlugin,
-            AssetsPlugin,
         ))
         .run();
 }

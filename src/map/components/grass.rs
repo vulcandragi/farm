@@ -1,20 +1,22 @@
 use bevy::{
-    asset::asset_value,
-    ecs::{observer::On, system::Res},
-    image::Image,
-    log::{tracing_subscriber::reload::Handle, warn},
+    asset::{Assets, asset_value},
+    color::Color,
+    ecs::{observer::On, system::Commands, template::template},
     math::primitives::Rectangle,
     mesh::Mesh2d,
     picking::{
         Pickable,
-        events::{Pointer, Press},
+        events::{Out, Over, Pointer},
     },
     scene::{Scene, SceneComponent, bsn, on},
     sprite::Anchor,
     sprite_render::{ColorMaterial, MeshMaterial2d},
 };
 
-use crate::map::{components::Block, resources::BlockAssets};
+use crate::{
+    effects::outline::componets::SpriteOutline,
+    map::{components::Block, resources::BlockAssets},
+};
 
 #[derive(SceneComponent, Default, Clone)]
 pub struct Grass;
@@ -25,13 +27,30 @@ impl Grass {
             #Grass
             Block
             Mesh2d(asset_value(Rectangle::new(32., 32.)))
-            MeshMaterial2d<ColorMaterial>(asset_value(ColorMaterial {
-                texture: Some(asset_value::<&'static str, Image>("grass.png").into()),
-                ..Default::default()
-            }))
             Anchor::BOTTOM_CENTER
             Pickable::default()
-            on(|click: On<Pointer<Press>>| warn!("test"))
+            on(Grass::on_hover_enter)
+            on(Grass::on_hover_left)
+            template(|context| {
+                let texture = context.resource::<BlockAssets>().grass.clone();
+                let mut meterial = context.resource_mut::<Assets<ColorMaterial>>();
+
+                Ok(MeshMaterial2d::<ColorMaterial>(meterial.add(ColorMaterial {
+                    texture: Some(texture),
+                    ..Default::default()
+                })))
+            })
         }
+    }
+
+    fn on_hover_enter(event: On<Pointer<Over>>, mut commands: Commands) {
+        commands.entity(event.entity).insert(SpriteOutline {
+            color: Color::WHITE,
+            thickness: 1,
+        });
+    }
+
+    fn on_hover_left(event: On<Pointer<Out>>, mut commands: Commands) {
+        commands.entity(event.entity).remove::<SpriteOutline>();
     }
 }
