@@ -1,18 +1,19 @@
 mod assets;
 mod camera;
 mod dev;
-mod effects;
+pub mod effects;
 mod map;
 mod shop;
 mod states;
 mod ui;
 
+use avian2d::{PhysicsPlugins, picking::PhysicsPickingPlugin};
 use bevy::prelude::*;
 use bevy_embedded_assets::{EmbeddedAssetPlugin, PluginMode};
 
 use crate::{
-    assets::AssetsPlugin, camera::CameraPlugin, dev::DevPlugin, effects::EffectsPlugin,
-    map::MapPlugin, shop::ShopPlugin, states::AppState, ui::UiPlugin,
+    assets::AssetsPlugin, camera::CameraPlugin, dev::DevPlugin, map::MapPlugin, shop::ShopPlugin,
+    states::AppState, ui::UiPlugin,
 };
 
 fn main() {
@@ -22,17 +23,11 @@ fn main() {
         })
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
-            MeshPickingPlugin,
+            PhysicsPlugins::default(),
+            PhysicsPickingPlugin,
         ))
         .init_state::<AppState>()
         .add_plugins(DevPlugin)
-        .add_plugins((
-            AssetsPlugin,
-            MapPlugin,
-            UiPlugin,
-            CameraPlugin,
-            ShopPlugin,
-            EffectsPlugin,
-        ))
+        .add_plugins((AssetsPlugin, MapPlugin, UiPlugin, CameraPlugin, ShopPlugin))
         .run();
 }

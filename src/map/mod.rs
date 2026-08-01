@@ -6,7 +6,6 @@ use bevy::{
     app::{Plugin, Update},
     ecs::{schedule::IntoScheduleConfigs, system::Commands},
     math::IVec3,
-    scene::{CommandsSceneExt, bsn},
     state::{condition::in_state, state::OnEnter},
 };
 use bevy_asset_loader::loading_state::{
@@ -34,17 +33,15 @@ impl Plugin for MapPlugin {
         .add_systems(
             Update,
             (fix_block_position).run_if(in_state(AppState::InGame)),
-        );
+        )
+        .add_observer(Grass::on_spawn);
     }
 }
 
 fn setup(mut commands: Commands) {
     for x in -25..25 {
         for y in -25..25 {
-            commands.spawn_scene(bsn! {
-                @Grass
-                BlockPos(IVec3 { x: x, y: y, z: 0 })
-            });
+            commands.spawn((Grass, BlockPos(IVec3 { x, y, z: 0 })));
         }
     }
 }

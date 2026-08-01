@@ -1,56 +1,87 @@
+use avian2d::collision::collider::Collider;
 use bevy::{
-    asset::{Assets, asset_value},
-    color::Color,
-    ecs::{observer::On, system::Commands, template::template},
-    math::primitives::Rectangle,
-    mesh::Mesh2d,
+    asset::Assets,
+    ecs::{
+        component::Component,
+        lifecycle::Add,
+        observer::On,
+        query,
+        system::{Commands, Query, Res, ResMut},
+    },
+    math::{Vec2, primitives::Rectangle},
+    mesh::{Mesh, Mesh2d},
     picking::{
         Pickable,
         events::{Out, Over, Pointer},
     },
-    scene::{Scene, SceneComponent, bsn, on},
-    sprite::Anchor,
+    sprite::{Anchor, Sprite},
     sprite_render::{ColorMaterial, MeshMaterial2d},
+    transform::components::Transform,
 };
 
 use crate::{
-    effects::outline::componets::SpriteOutline,
-    map::{components::Block, resources::BlockAssets},
+    effects::componnets::Outline,
+    map::{
+        components::{Block, BlockPos},
+        resources::BlockAssets,
+    },
 };
 
-#[derive(SceneComponent, Default, Clone)]
+#[derive(Component)]
 pub struct Grass;
 
 impl Grass {
-    pub fn scene() -> impl Scene {
-        bsn! {
-            #Grass
-            Block
-            Mesh2d(asset_value(Rectangle::new(32., 32.)))
-            Anchor::BOTTOM_CENTER
-            Pickable::default()
-            on(Grass::on_hover_enter)
-            on(Grass::on_hover_left)
-            template(|context| {
-                let texture = context.resource::<BlockAssets>().grass.clone();
-                let mut meterial = context.resource_mut::<Assets<ColorMaterial>>();
+    pub fn on_spawn(
+        event: On<Add, (Grass, BlockPos)>,
+        mut commands: Commands,
+        mut meshs: ResMut<Assets<Mesh>>,
+        mut materials: ResMut<Assets<ColorMaterial>>,
+        texture: Res<BlockAssets>,
+    ) {
+        let collider = Collider::convex_hull(vec![
+            Vec2::new(-16., 0.),
+            Vec2::new(0., -8.),
+            Vec2::new(16., 0.),
+            Vec2::new(0., 8.),
+        ])
+        .unwrap();
 
-                Ok(MeshMaterial2d::<ColorMaterial>(meterial.add(ColorMaterial {
-                    texture: Some(texture),
+        commands
+            .entity(event.entity)
+            .insert((
+                Block,
+                Mesh2d(meshs.add(Rectangle::new(32., 32.))),
+                MeshMaterial2d(materials.add(ColorMaterial {
+                    texture: Some(texture.grass.clone()),
                     ..Default::default()
-                })))
-            })
-        }
+                })),
+                Anchor::BOTTOM_CENTER,
+                Pickable::default(),
+                collider,
+            ))
+            .observe(Self::on_hover_enter)
+            .observe(Self::on_hover_left);
     }
 
-    fn on_hover_enter(event: On<Pointer<Over>>, mut commands: Commands) {
-        commands.entity(event.entity).insert(SpriteOutline {
-            color: Color::WHITE,
-            thickness: 0.1,
-        });
+    fn on_hover_enter(
+        event: On<Pointer<Over>>,
+        query: Query<&Transform>,
+        mut commands: Commands,
+        texture: Res<BlockAssets>,
+    ) {
+        let transform = query.get(event.entity).unwrap();
+
+        commands.entity(event.entity).with_child((
+            Outline,
+            Sprite {
+                image: texture.block_outilne.clone(),
+                ..Default::default()
+            },
+            Transform::from_xyz(0., 0., transform.translation.z + 1.),
+        ));
     }
 
     fn on_hover_left(event: On<Pointer<Out>>, mut commands: Commands) {
-        commands.entity(event.entity).remove::<SpriteOutline>();
+        commands.entity(event.entity).despawn_children();
     }
 }

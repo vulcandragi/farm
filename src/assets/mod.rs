@@ -1,6 +1,5 @@
 use bevy::app::Plugin;
 use bevy_asset_loader::loading_state::{LoadingState, LoadingStateAppExt};
-use bevy_embedded_assets::{EmbeddedAssetPlugin, PluginMode};
 
 use crate::states::AppState;
 
