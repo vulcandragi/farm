@@ -30,17 +30,19 @@ impl Plugin for MapPlugin {
             LoadingStateConfig::new(AppState::Loading).load_collection::<BlockAssets>(),
         )
         .add_systems(OnEnter(AppState::InGame), setup)
-        .add_systems(
-            Update,
-            (fix_block_position).run_if(in_state(AppState::InGame)),
-        )
+        // .add_systems(
+        //     Update,
+        //     (fix_block_position).run_if(in_state(AppState::InGame)),
+        // )
         .add_observer(Grass::on_spawn);
     }
 }
 
 fn setup(mut commands: Commands) {
-    for x in -25..25 {
-        for y in -25..25 {
+    let size = 25;
+
+    for x in -size..size {
+        for y in -size..size {
             commands.spawn((Grass, BlockPos(IVec3 { x, y, z: 0 })));
         }
     }

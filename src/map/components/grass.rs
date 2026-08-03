@@ -5,10 +5,10 @@ use bevy::{
         component::Component,
         lifecycle::Add,
         observer::On,
-        query,
+        query::{self, With},
         system::{Commands, Query, Res, ResMut},
     },
-    math::{Vec2, primitives::Rectangle},
+    math::{Vec2, Vec3, primitives::Rectangle},
     mesh::{Mesh, Mesh2d},
     picking::{
         Pickable,
@@ -33,6 +33,7 @@ pub struct Grass;
 impl Grass {
     pub fn on_spawn(
         event: On<Add, (Grass, BlockPos)>,
+        query: Query<&BlockPos, With<Grass>>,
         mut commands: Commands,
         mut meshs: ResMut<Assets<Mesh>>,
         mut materials: ResMut<Assets<ColorMaterial>>,
@@ -45,6 +46,7 @@ impl Grass {
             Vec2::new(0., 8.),
         ])
         .unwrap();
+        let position = query.get(event.entity).unwrap().0;
 
         commands
             .entity(event.entity)
@@ -57,6 +59,14 @@ impl Grass {
                 })),
                 Anchor::BOTTOM_CENTER,
                 Pickable::default(),
+                Transform {
+                    translation: Vec3::new(
+                        ((position.x - position.y) * 16) as f32,
+                        ((position.x + position.y) * 8) as f32,
+                        -(position.x + position.y) as f32,
+                    ),
+                    ..Default::default()
+                },
                 collider,
             ))
             .observe(Self::on_hover_enter)
@@ -77,7 +87,7 @@ impl Grass {
                 image: texture.block_outilne.clone(),
                 ..Default::default()
             },
-            Transform::from_xyz(0., 0., transform.translation.z + 1.),
+            Transform::from_xyz(0., 0., 2.),
         ));
     }
 
