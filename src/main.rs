@@ -8,7 +8,7 @@ mod states;
 mod ui;
 
 use avian2d::{PhysicsPlugins, picking::PhysicsPickingPlugin};
-use bevy::prelude::*;
+use bevy::{prelude::*, window::PresentMode};
 use bevy_embedded_assets::{EmbeddedAssetPlugin, PluginMode};
 
 use crate::{
@@ -22,7 +22,15 @@ fn main() {
             mode: PluginMode::ReplaceDefault,
         })
         .add_plugins((
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        present_mode: PresentMode::Immediate,
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                }),
             PhysicsPlugins::default(),
             PhysicsPickingPlugin,
         ))

@@ -1,21 +1,18 @@
 use avian2d::collision::collider::Collider;
 use bevy::{
-    asset::Assets,
     ecs::{
         component::Component,
         lifecycle::Add,
         observer::On,
-        query::{self, With},
-        system::{Commands, Query, Res, ResMut},
+        query::With,
+        system::{Commands, Query, Res},
     },
-    math::{Vec2, Vec3, primitives::Rectangle},
-    mesh::{Mesh, Mesh2d},
+    math::{Vec2, Vec3},
     picking::{
         Pickable,
         events::{Out, Over, Pointer},
     },
-    sprite::{Anchor, Sprite},
-    sprite_render::{ColorMaterial, MeshMaterial2d},
+    sprite::Sprite,
     transform::components::Transform,
 };
 
@@ -35,8 +32,6 @@ impl Grass {
         event: On<Add, (Grass, BlockPos)>,
         query: Query<&BlockPos, With<Grass>>,
         mut commands: Commands,
-        mut meshs: ResMut<Assets<Mesh>>,
-        mut materials: ResMut<Assets<ColorMaterial>>,
         texture: Res<BlockAssets>,
     ) {
         let collider = Collider::convex_hull(vec![
@@ -52,12 +47,10 @@ impl Grass {
             .entity(event.entity)
             .insert((
                 Block,
-                Mesh2d(meshs.add(Rectangle::new(32., 32.))),
-                MeshMaterial2d(materials.add(ColorMaterial {
-                    texture: Some(texture.grass.clone()),
+                Sprite {
+                    image: texture.grass.clone(),
                     ..Default::default()
-                })),
-                Anchor::BOTTOM_CENTER,
+                },
                 Pickable::default(),
                 Transform {
                     translation: Vec3::new(
@@ -73,14 +66,7 @@ impl Grass {
             .observe(Self::on_hover_left);
     }
 
-    fn on_hover_enter(
-        event: On<Pointer<Over>>,
-        query: Query<&Transform>,
-        mut commands: Commands,
-        texture: Res<BlockAssets>,
-    ) {
-        let transform = query.get(event.entity).unwrap();
-
+    fn on_hover_enter(event: On<Pointer<Over>>, mut commands: Commands, texture: Res<BlockAssets>) {
         commands.entity(event.entity).with_child((
             Outline,
             Sprite {

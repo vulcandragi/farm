@@ -9,7 +9,7 @@ use bevy::{
     scene::{CommandsSceneExt, bsn, on},
     state::{condition::in_state, state::OnEnter},
     text::{TextColor, TextFont},
-    ui::{Node, px, widget::Text},
+    ui::{Node, PositionType, px, widget::Text},
 };
 
 use crate::{
@@ -31,7 +31,8 @@ fn setup(mut commands: Commands) {
     commands.queue_spawn_scene(bsn! {
         Node {
             padding: px(20),
-            right: px(0)
+            right: px(0),
+            position_type: PositionType::Absolute
         }
         Children [
             MoneyTextUi
